@@ -19,13 +19,7 @@ var BuildDate = ""
 
 func main() {
 	printVersion()
-	log.Println("Opening SQLite database")
-	dbPath := "./mail.sqlite"
-	var err error
-	db, err = sql.Open("sqlite3", dbPath)
-	if err != nil {
-		log.Fatalf("Unable to open or create SQLite database file '%s': %s", dbPath, err)
-	}
+	db = openDatabase()
 	defer db.Close()
 	prepareDatabase(db)
 	prepareCert()

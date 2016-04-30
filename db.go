@@ -5,6 +5,16 @@ import (
 	"database/sql"
 )
 
+func openDatabase() *sql.DB {
+	log.Println("Opening SQLite database")
+	dbPath := "./mail.sqlite"
+	db, err := sql.Open("sqlite3", dbPath)
+	if err != nil {
+		log.Fatalf("Unable to open or create SQLite database file '%s': %s", dbPath, err)
+	}
+	return db
+}
+
 func prepareDatabase(db *sql.DB) {
 	var count int
 	err := db.QueryRow("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'mail'").Scan(&count)
