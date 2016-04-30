@@ -3,10 +3,8 @@ package main
 import "fmt"
 import (
 	"bitbucket.org/chrj/smtpd"
-	"crypto/tls"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/nochso/smtpd/models"
 	"log"
 )
 
@@ -24,17 +22,7 @@ func main() {
 	defer db.Close()
 	prepareDatabase(db)
 	prepareCert()
-	log.Println("Loading TLS certificate")
-	cert, err := tls.LoadX509KeyPair("cert.pem", "key.pem")
-	if err != nil {
-		log.Fatalf("Cert load failed: %v", err)
-	}
-	server = &smtpd.Server{
-		Handler: handle,
-		TLSConfig: &tls.Config{
-			Certificates: []tls.Certificate{cert},
-		},
-	}
+	server := prepareServer()
 	log.Println("Starting smtpd server")
 	server.ListenAndServe(fmt.Sprintf(":%d", smtpPort))
 }
@@ -48,23 +36,4 @@ func printVersion() {
 		fmt.Printf(" built %s", BuildDate)
 	}
 	fmt.Print("\n\n")
-}
-
-func getAddressId(address string) int {
-	addr, err := models.AddressByAddress(db, address)
-	if err != nil {
-		addr = &models.Address{Address: address}
-		addr.Insert(db)
-		return addr.ID
-	}
-	return addr.ID
-}
-
-func handle(peer smtpd.Peer, env smtpd.Envelope) error {
-	fmt.Printf("Sender: %s\nRecipients: %s\nContent:\n%s\n-----\n", env.Sender, env.Recipients[0], env.Data)
-	log.Println(getAddressId(env.Sender))
-	for _, recp := range env.Recipients {
-		log.Println(getAddressId(recp))
-	}
-	return nil
 }
