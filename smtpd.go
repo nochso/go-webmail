@@ -12,6 +12,7 @@ import (
 
 var db *sql.DB
 var server *smtpd.Server
+var host = "noch.so,loggle.tv"
 
 var Version = ""
 var BuildDate = ""
@@ -27,9 +28,9 @@ func main() {
 	}
 	defer db.Close()
 	prepareDatabase(db)
-
+	prepareCert()
 	log.Println("Loading TLS certificate")
-	cert, err := tls.LoadX509KeyPair("server.pem", "server.key")
+	cert, err := tls.LoadX509KeyPair("cert.pem", "key.pem")
 	if err != nil {
 		log.Fatalf("Cert load failed: %v", err)
 	}
