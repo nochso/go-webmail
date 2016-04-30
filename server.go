@@ -4,15 +4,16 @@ import (
 	"bitbucket.org/chrj/smtpd"
 	"crypto/tls"
 	"fmt"
+	"github.com/jbrodriguez/mlog"
 	"github.com/nochso/smtpd/models"
-	"log"
+	"path"
 )
 
 func prepareServer() *smtpd.Server {
-	log.Println("Loading TLS certificate")
-	cert, err := tls.LoadX509KeyPair("cert.pem", "key.pem")
+	mlog.Info("Loading TLS certificate")
+	cert, err := tls.LoadX509KeyPair(path.Join(dataDir, "cert.pem"), path.Join(dataDir, "key.pem"))
 	if err != nil {
-		log.Fatalf("Cert load failed: %v", err)
+		mlog.Fatalf("Cert load failed: %v", err)
 	}
 	server = &smtpd.Server{
 		Handler: handle,
@@ -25,9 +26,9 @@ func prepareServer() *smtpd.Server {
 
 func handle(peer smtpd.Peer, env smtpd.Envelope) error {
 	fmt.Printf("Sender: %s\nRecipients: %s\nContent:\n%s\n-----\n", env.Sender, env.Recipients[0], env.Data)
-	log.Println(getAddressId(env.Sender))
+	mlog.Info("%d", getAddressId(env.Sender))
 	for _, recp := range env.Recipients {
-		log.Println(getAddressId(recp))
+		mlog.Info("%d", getAddressId(recp))
 	}
 	return nil
 }

@@ -2,15 +2,16 @@ package main
 
 import (
 	"database/sql"
-	"log"
+	"github.com/jbrodriguez/mlog"
+	"path"
 )
 
 func openDatabase() *sql.DB {
-	log.Println("Opening SQLite database")
-	dbPath := "./mail.sqlite"
+	mlog.Info("Opening SQLite database")
+	dbPath := path.Join(dataDir, "mail.sqlite")
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
-		log.Fatalf("Unable to open or create SQLite database file '%s': %s", dbPath, err)
+		mlog.Fatalf("Unable to open or create SQLite database file '%s': %s", dbPath, err)
 	}
 	return db
 }
@@ -19,12 +20,12 @@ func prepareDatabase(db *sql.DB) {
 	var count int
 	err := db.QueryRow("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'mail'").Scan(&count)
 	if err != nil {
-		log.Fatal(err)
+		mlog.Fatal(err)
 	}
 	if count == 1 {
 		return
 	}
-	log.Println("Setting up database schema")
+	mlog.Info("Setting up database schema")
 	_, err = db.Exec(`
 CREATE TABLE address
 (
@@ -56,6 +57,6 @@ CREATE INDEX "idx_mail_recipient_mail_id" ON "mail_recipient" ("mail_id");
 CREATE UNIQUE INDEX "uidx_mail_recipient_mail_id_recipient_id" ON "mail_recipient" ("mail_id", "recipient_id");
 `)
 	if err != nil {
-		log.Fatalf("Unable to set up database schema: %s", err)
+		mlog.Fatalf("Unable to set up database schema: %s", err)
 	}
 }
