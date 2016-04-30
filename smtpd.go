@@ -13,6 +13,7 @@ import (
 var db *sql.DB
 var server *smtpd.Server
 var host = "noch.so,loggle.tv"
+var smtpPort = 25
 
 var Version = ""
 var BuildDate = ""
@@ -35,7 +36,7 @@ func main() {
 		},
 	}
 	log.Println("Starting smtpd server")
-	server.ListenAndServe(":25")
+	server.ListenAndServe(fmt.Sprintf(":%d", smtpPort))
 }
 
 func printVersion() {
