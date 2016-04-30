@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/jbrodriguez/mlog"
-	"github.com/nochso/smtpd/models"
 	"path"
 )
 
@@ -31,14 +30,4 @@ func handle(peer smtpd.Peer, env smtpd.Envelope) error {
 		mlog.Info("%d", getAddressId(recp))
 	}
 	return nil
-}
-
-func getAddressId(address string) int {
-	addr, err := models.AddressByAddress(db, address)
-	if err != nil {
-		addr = &models.Address{Address: address}
-		addr.Insert(db)
-		return addr.ID
-	}
-	return addr.ID
 }

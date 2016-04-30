@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"github.com/jbrodriguez/mlog"
+	"github.com/nochso/smtpd/models"
 	"path"
 )
 
@@ -14,6 +15,16 @@ func openDatabase() *sql.DB {
 		mlog.Fatalf("Unable to open or create SQLite database file '%s': %s", dbPath, err)
 	}
 	return db
+}
+
+func getAddressId(address string) int {
+	addr, err := models.AddressByAddress(db, address)
+	if err != nil {
+		addr = &models.Address{Address: address}
+		addr.Insert(db)
+		return addr.ID
+	}
+	return addr.ID
 }
 
 func prepareDatabase(db *sql.DB) {
