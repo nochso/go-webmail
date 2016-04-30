@@ -13,7 +13,11 @@ import (
 var db *sql.DB
 var server *smtpd.Server
 
+var Version = ""
+var BuildDate = ""
+
 func main() {
+	printVersion()
 	log.Println("Opening SQLite database")
 	dbPath := "./mail.sqlite"
 	var err error
@@ -37,6 +41,17 @@ func main() {
 	}
 	log.Println("Starting smtpd server")
 	server.ListenAndServe("127.0.0.1:25")
+}
+
+func printVersion() {
+	fmt.Print("noch.so smtpd")
+	if Version != "" {
+		fmt.Printf(" %s", Version)
+	}
+	if BuildDate != "" {
+		fmt.Printf(" built %s", BuildDate)
+	}
+	fmt.Print("\n\n")
 }
 
 func getAddressId(address string) int {
