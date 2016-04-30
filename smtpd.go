@@ -41,7 +41,7 @@ func main() {
 		},
 	}
 	log.Println("Starting smtpd server")
-	server.ListenAndServe("127.0.0.1:25")
+	server.ListenAndServe(":25")
 }
 
 func printVersion() {
