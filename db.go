@@ -3,8 +3,10 @@ package main
 import (
 	"database/sql"
 	"github.com/jbrodriguez/mlog"
+	"fmt"
 	"github.com/nochso/smtpd/models"
 	"path"
+	"strings"
 )
 
 func openDatabase() *sql.DB {
@@ -13,6 +15,17 @@ func openDatabase() *sql.DB {
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		mlog.Fatalf("Unable to open or create SQLite database file '%s': %s", dbPath, err)
+	}
+	models.XOLog = func(query string, data ...interface{}) {
+		trimData := ""
+		for _, value := range data {
+			trimValue := fmt.Sprintf("%#v", value)
+			if len(trimValue) > 20 {
+				trimValue = trimValue[0:20] + ".."
+			}
+			trimData = fmt.Sprintf("%s, %s", trimData, trimValue)
+		}
+		mlog.Trace("SQL: %s (%s)", query, strings.TrimLeft(trimData, ", "))
 	}
 	return db
 }
