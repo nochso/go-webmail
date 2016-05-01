@@ -70,7 +70,7 @@ func prepareCert() {
 
 	keyOut, err := os.OpenFile(keyPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		mlog.Fatalf("failed to open %s for writing:", keyPath, err)
+		mlog.Fatalf("failed to open %s for writing: %s", keyPath, err)
 		return
 	}
 	pemBlock := &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)}
