@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bitbucket.org/chrj/smtpd"
+	"bitbucket.org/porkbonk/smtpd"
 	"crypto/tls"
 	"fmt"
 	"github.com/nochso/mlog"

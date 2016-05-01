@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 import (
-	"bitbucket.org/chrj/smtpd"
+	"bitbucket.org/porkbonk/smtpd"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/nochso/mlog"
