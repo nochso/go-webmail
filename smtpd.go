@@ -10,11 +10,13 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"strings"
 )
 
 var db *sql.DB
 var server *smtpd.Server
 var host = "noch.so,loggle.tv"
+var hosts []string
 var smtpPort = 25
 var dataDir = "./data"
 var logDir = "./log"
@@ -23,6 +25,7 @@ var Version = ""
 var BuildDate = ""
 
 func main() {
+	hosts = strings.Split(host, ",")
 	mlog.DefaultFlags = log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile
 	mlog.Start(mlog.LevelTrace, path.Join(logDir, "smtpd.log"))
 	mlog.Info("-----------------------------------------------")

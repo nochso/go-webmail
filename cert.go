@@ -45,7 +45,6 @@ func prepareCert() {
 		BasicConstraintsValid: true,
 	}
 
-	hosts := strings.Split(host, ",")
 	for _, h := range hosts {
 		if ip := net.ParseIP(h); ip != nil {
 			template.IPAddresses = append(template.IPAddresses, ip)
