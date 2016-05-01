@@ -15,12 +15,18 @@ func prepareServer() *smtpd.Server {
 		mlog.Fatalf("Cert load failed: %v", err)
 	}
 	server = &smtpd.Server{
-		Handler: handle,
+		ConnectionChecker: handleConnection,
+		Handler:           handle,
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{cert},
 		},
 	}
 	return server
+}
+
+func handleConnection(peer smtpd.Peer) error {
+	mlog.Info("Connection accepted: remote_host=%s", peer.Addr)
+	return nil
 }
 
 func handle(peer smtpd.Peer, env smtpd.Envelope) error {
