@@ -4,7 +4,7 @@ import (
 	"bitbucket.org/chrj/smtpd"
 	"crypto/tls"
 	"fmt"
-	"github.com/jbrodriguez/mlog"
+	"github.com/nochso/mlog"
 	"path"
 )
 

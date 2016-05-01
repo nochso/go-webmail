@@ -6,7 +6,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"github.com/jbrodriguez/mlog"
+	"github.com/nochso/mlog"
 	"math/big"
 	"net"
 	"os"

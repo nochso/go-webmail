@@ -2,8 +2,8 @@ package main
 
 import (
 	"database/sql"
-	"github.com/jbrodriguez/mlog"
 	"fmt"
+	"github.com/nochso/mlog"
 	"github.com/nochso/smtpd/models"
 	"path"
 	"strings"
