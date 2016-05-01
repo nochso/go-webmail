@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/nochso/mlog"
+	"log"
 	"os"
 	"os/user"
 	"path"
@@ -22,6 +23,7 @@ var Version = ""
 var BuildDate = ""
 
 func main() {
+	mlog.DefaultFlags = log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile
 	mlog.Start(mlog.LevelTrace, path.Join(logDir, "smtpd.log"))
 	mlog.Info("-----------------------------------------------")
 	printVersion()
