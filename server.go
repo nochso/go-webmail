@@ -8,6 +8,7 @@ import (
 	"github.com/nochso/smtpd/models"
 	"net/mail"
 	"path"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -46,7 +47,7 @@ func handle(peer smtpd.Peer, env smtpd.Envelope) error {
 		tlsInfo = fmt.Sprintf(" tls_version=%s tls_cypher=0x%x", tlsVersions[peer.TLS.Version], peer.TLS.CipherSuite)
 	}
 	mlog.Info(
-		"Accepting mail: remote_host=%s protocol=%s helo_name=%s%s",
+		"Incoming mail: remote_host=%s protocol=%s helo_name=%s%s",
 		peer.Addr,
 		peer.Protocol,
 		peer.HeloName,
@@ -62,26 +63,50 @@ func handle(peer smtpd.Peer, env smtpd.Envelope) error {
 	if err != nil {
 		sender = &mail.Address{Address: header.Get("From")}
 	}
-	mailRow := models.Mail{
-		SenderID:   getAddressId(sender),
-		Content:    string(env.Data),
-		TsReceived: time.Now().Unix(),
-		Subject:    header.Get("Subject"),
-	}
-	mailRow.Save(db)
 	recipients, err := mail.ParseAddressList(header.Get("To"))
 	if err != nil {
 		mlog.Warning("Unable to parse 'To' header '%s': %s", header.Get("to"), err)
 	}
-	for _, recipient := range recipients {
-		recipientRow := &models.MailRecipient{
-			MailID:      mailRow.ID,
+	allowedRecipients := filterAddressesByAllowedHosts(recipients)
+	if len(allowedRecipients) == 0 {
+		mlog.Warning("Ignoring mail: none of the recipient domains are allowed: %v", recipients)
+		return nil
+	}
+	mlog.Info("Saving mail with %d acceptable recipient(s)", len(allowedRecipients))
+	for _, recipient := range allowedRecipients {
+		mailRow := models.Mail{
+			SenderID:   getAddressId(sender),
 			RecipientID: getAddressId(recipient),
+			Content:    string(env.Data),
+			TsReceived: time.Now().Unix(),
+			Subject:    header.Get("Subject"),
 		}
-		err := recipientRow.Save(db)
+		err = mailRow.Save(db)
 		if err != nil {
-			mlog.Warning("Error saving recipient %s", err)
+			mlog.Warning(err.Error())
 		}
 	}
 	return nil
+}
+
+// filterAddressesByAllowedHosts returns all mail addresses are allowed according to hosts
+func filterAddressesByAllowedHosts(addresses []*mail.Address) []*mail.Address {
+	allowed := make([]*mail.Address, 0)
+	for _, address := range addresses {
+		if addressBelongsToHost(address) {
+			allowed = append(allowed, address)
+		}
+	}
+	return allowed
+}
+
+// addressBelongsToHost returns true if the address belongs to one of the allowed hosts
+func addressBelongsToHost(addr *mail.Address) bool {
+	for _, host := range hosts {
+		re := regexp.MustCompile(fmt.Sprintf(`.+@(.+\.)?%s$`, regexp.QuoteMeta(host)))
+		if re.MatchString(addr.Address) {
+			return true
+		}
+	}
+	return false
 }
