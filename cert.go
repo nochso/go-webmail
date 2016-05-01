@@ -22,7 +22,6 @@ func prepareCert() {
 		return
 	}
 	mlog.Info("Creating certificate")
-	host := "localhost"
 	priv, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		mlog.Fatalf("failed to generate private key: %s", err)
