@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/nochso/mlog"
 	"github.com/nochso/smtpd/models"
+	"net/mail"
 	"path"
 	"strings"
 )
@@ -32,14 +33,17 @@ func openDatabase() *sql.DB {
 	return db
 }
 
-func getAddressId(address string) int {
-	addr, err := models.AddressByAddress(db, address)
+func getAddressId(address *mail.Address) int64 {
+	addrRow, err := models.AddressByAddress(db, address.Address)
 	if err != nil {
-		addr = &models.Address{Address: address}
-		addr.Insert(db)
-		return addr.ID
+		addrRow = &models.Address{
+			Address: address.Address,
+			Name:    address.Name,
+		}
+		addrRow.Insert(db)
+		return addrRow.ID
 	}
-	return addr.ID
+	return addrRow.ID
 }
 
 func prepareDatabase(db *sql.DB) {
