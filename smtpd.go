@@ -22,7 +22,7 @@ var Version = ""
 var BuildDate = ""
 
 func main() {
-	mlog.Start(mlog.LevelInfo, path.Join(logDir, "smtpd.log"))
+	mlog.Start(mlog.LevelTrace, path.Join(logDir, "smtpd.log"))
 	mlog.Info("-----------------------------------------------")
 	printVersion()
 	user, err := user.Current()
