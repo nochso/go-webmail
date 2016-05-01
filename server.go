@@ -13,6 +13,10 @@ import (
 	"time"
 )
 
+// hostsRegex is a regular expression based on hosts to check if mails for
+// these hosts will be accepted.
+var hostsRegex *regexp.Regexp
+
 func prepareServer() *smtpd.Server {
 	mlog.Info("Loading TLS certificate")
 	cert, err := tls.LoadX509KeyPair(path.Join(dataDir, "cert.pem"), path.Join(dataDir, "key.pem"))
@@ -72,7 +76,7 @@ func handle(peer smtpd.Peer, env smtpd.Envelope) error {
 		mlog.Warning("Ignoring mail: none of the recipient domains are allowed: %v", recipients)
 		return nil
 	}
-	mlog.Info("Saving mail with %d acceptable recipient(s)", len(allowedRecipients))
+	mlog.Info("Saving %d mail(s) for recipient(s): %v", len(allowedRecipients), allowedRecipients)
 	for _, recipient := range allowedRecipients {
 		mailRow := models.Mail{
 			SenderID:   getAddressId(sender),
@@ -102,11 +106,14 @@ func filterAddressesByAllowedHosts(addresses []*mail.Address) []*mail.Address {
 
 // addressBelongsToHost returns true if the address belongs to one of the allowed hosts
 func addressBelongsToHost(addr *mail.Address) bool {
-	for _, host := range hosts {
-		re := regexp.MustCompile(fmt.Sprintf(`.+@(.+\.)?%s$`, regexp.QuoteMeta(host)))
-		if re.MatchString(addr.Address) {
-			return true
+	if hostsRegex == nil {
+		// Build and cache regex to match acceptable recipient addresses
+		hostsRegexes := make([]string, len(hosts))
+		for i, host := range hosts {
+			hostsRegexes[i] = regexp.QuoteMeta(host)
 		}
+		hostsRegex = regexp.MustCompile(fmt.Sprintf(`.+@(.+\.)?(%s)$`, strings.Join(hostsRegexes, "|")))
+		mlog.Trace("Host recipient regex: %s", hostsRegex)
 	}
-	return false
+	return hostsRegex.MatchString(addr.Address)
 }
