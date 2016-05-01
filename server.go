@@ -20,6 +20,7 @@ func prepareServer() *smtpd.Server {
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{cert},
 		},
+		ProtocolLogger: mlog.Logger.Trace,
 	}
 	return server
 }
