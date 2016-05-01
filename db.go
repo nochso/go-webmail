@@ -23,7 +23,7 @@ func openDatabase() *sql.DB {
 			if len(trimValue) > 40 {
 				trimValue = trimValue[0:40] + ".."
 				if trimValue[0] == '"' {
-					trimValue +=  "\""
+					trimValue += "\""
 				}
 			}
 			query = strings.Replace(query, "?", trimValue, 1)

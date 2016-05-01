@@ -79,11 +79,11 @@ func handle(peer smtpd.Peer, env smtpd.Envelope) error {
 	mlog.Info("Saving %d mail(s) for recipient(s): %v", len(allowedRecipients), allowedRecipients)
 	for _, recipient := range allowedRecipients {
 		mailRow := models.Mail{
-			SenderID:   getAddressId(sender),
+			SenderID:    getAddressId(sender),
 			RecipientID: getAddressId(recipient),
-			Content:    string(env.Data),
-			TsReceived: time.Now().Unix(),
-			Subject:    header.Get("Subject"),
+			Content:     string(env.Data),
+			TsReceived:  time.Now().Unix(),
+			Subject:     header.Get("Subject"),
 		}
 		err = mailRow.Save(db)
 		if err != nil {
