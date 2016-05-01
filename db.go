@@ -17,15 +17,17 @@ func openDatabase() *sql.DB {
 		mlog.Fatalf("Unable to open or create SQLite database file '%s': %s", dbPath, err)
 	}
 	models.XOLog = func(query string, data ...interface{}) {
-		trimData := ""
 		for _, value := range data {
 			trimValue := fmt.Sprintf("%#v", value)
-			if len(trimValue) > 20 {
-				trimValue = trimValue[0:20] + ".."
+			if len(trimValue) > 40 {
+				trimValue = trimValue[0:40] + ".."
+				if trimValue[0] == '"' {
+					trimValue +=  "\""
+				}
 			}
-			trimData = fmt.Sprintf("%s, %s", trimData, trimValue)
+			query = strings.Replace(query, "?", trimValue, 1)
 		}
-		mlog.Trace("SQL: %s (%s)", query, strings.TrimLeft(trimData, ", "))
+		mlog.Trace("SQL: %s", query)
 	}
 	return db
 }
