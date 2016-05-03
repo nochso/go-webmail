@@ -6,7 +6,6 @@ import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/nochso/mlog"
-	"gopkg.in/yaml.v2"
 	"log"
 	"os"
 	"os/user"
@@ -31,11 +30,7 @@ func main() {
 	if err == nil {
 		mlog.Info("Running as user '%s'", user.Name)
 	}
-	d, err := yaml.Marshal(&cfg)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
-	mlog.Info("Using configuration:\n%s", string(d))
+	mlog.Info("Loaded configuration:\n%s", getConfigDiff())
 	prepareDirs()
 	db = openDatabase()
 	defer db.Close()
