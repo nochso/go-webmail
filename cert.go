@@ -11,6 +11,7 @@ import (
 	"net"
 	"os"
 	"path"
+	"strings"
 	"time"
 )
 
@@ -44,10 +45,18 @@ func prepareCert() {
 		BasicConstraintsValid: true,
 	}
 
-	for _, h := range hosts {
+	usedHosts := map[string]bool{}
+	for _, h := range cfg.Accept.Domains {
+		h = strings.Trim(h, ".")
+		if usedHosts[h] {
+			continue
+		}
+		usedHosts[h] = true
 		if ip := net.ParseIP(h); ip != nil {
+			mlog.Info("Adding IP address to certificate: %s", ip)
 			template.IPAddresses = append(template.IPAddresses, ip)
 		} else {
+			mlog.Info("Adding DNS name to certificate: %s", h)
 			template.DNSNames = append(template.DNSNames, h)
 		}
 	}

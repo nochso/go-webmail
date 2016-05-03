@@ -6,18 +6,15 @@ import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/nochso/mlog"
+	"gopkg.in/yaml.v2"
 	"log"
 	"os"
 	"os/user"
 	"path"
-	"strings"
 )
 
 var db *sql.DB
 var server *smtpd.Server
-var host = "noch.so,loggle.tv"
-var hosts []string
-var smtpPort = 25
 var dataDir = "./data"
 var logDir = "./log"
 
@@ -25,8 +22,8 @@ var Version = ""
 var BuildDate = ""
 
 func main() {
-	hosts = strings.Split(host, ",")
-	mlog.DefaultFlags = log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile
+	prepareConfig()
+	mlog.DefaultFlags = log.Ldate | log.Ltime | log.Lmicroseconds
 	mlog.Start(mlog.LevelTrace, path.Join(logDir, "smtpd.log"))
 	mlog.Info("-----------------------------------------------")
 	printVersion()
@@ -34,6 +31,11 @@ func main() {
 	if err == nil {
 		mlog.Info("Running as user '%s'", user.Name)
 	}
+	d, err := yaml.Marshal(&cfg)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+	mlog.Info("Using configuration:\n%s", string(d))
 	prepareDirs()
 	db = openDatabase()
 	defer db.Close()
@@ -41,7 +43,7 @@ func main() {
 	prepareCert()
 	server := prepareServer()
 	mlog.Info("Starting smtpd server")
-	err = server.ListenAndServe(fmt.Sprintf(":%d", smtpPort))
+	err = server.ListenAndServe(fmt.Sprintf(":%d", cfg.Port))
 	if err != nil {
 		mlog.Fatalf("Error while listening/serving: %s", err)
 	}

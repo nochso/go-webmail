@@ -93,7 +93,7 @@ func handle(peer smtpd.Peer, env smtpd.Envelope) error {
 	return nil
 }
 
-// filterAddressesByAllowedHosts returns all mail addresses are allowed according to hosts
+// filterAddressesByAllowedHosts returns all mail addresses are allowed according to smtp.accept.domains
 func filterAddressesByAllowedHosts(addresses []*mail.Address) []*mail.Address {
 	allowed := make([]*mail.Address, 0)
 	for _, address := range addresses {
@@ -106,14 +106,16 @@ func filterAddressesByAllowedHosts(addresses []*mail.Address) []*mail.Address {
 
 // addressBelongsToHost returns true if the address belongs to one of the allowed hosts
 func addressBelongsToHost(addr *mail.Address) bool {
-	if hostsRegex == nil {
-		// Build and cache regex to match acceptable recipient addresses
-		hostsRegexes := make([]string, len(hosts))
-		for i, host := range hosts {
-			hostsRegexes[i] = regexp.QuoteMeta(host)
+	for _, domain := range cfg.Domains {
+		if strings.HasPrefix(domain, ".") {
+			if strings.HasSuffix(addr.Address, domain) {
+				return true
+			}
+		} else if strings.HasSuffix(addr.Address, "@"+domain) {
+			return true
+		} else if domain == "*" {
+			return true
 		}
-		hostsRegex = regexp.MustCompile(fmt.Sprintf(`.+@(.+\.)?(%s)$`, strings.Join(hostsRegexes, "|")))
-		mlog.Trace("Host recipient regex: %s", hostsRegex)
 	}
-	return hostsRegex.MatchString(addr.Address)
+	return false
 }
