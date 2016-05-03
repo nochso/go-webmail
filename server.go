@@ -8,14 +8,9 @@ import (
 	"github.com/nochso/smtpd/models"
 	"net/mail"
 	"path"
-	"regexp"
 	"strings"
 	"time"
 )
-
-// hostsRegex is a regular expression based on hosts to check if mails for
-// these hosts will be accepted.
-var hostsRegex *regexp.Regexp
 
 func prepareServer() *smtpd.Server {
 	mlog.Info("Loading TLS certificate")
