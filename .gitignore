@@ -1,3 +1,4 @@
-### Go template
 smtpd.exe
 smtpd
+data/*
+log/*
