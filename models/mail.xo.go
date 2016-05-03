@@ -172,6 +172,45 @@ func MailsByIsDeletedTsDeleted(db XODB, isDeleted int64, tsDeleted sql.NullInt64
 	return res, nil
 }
 
+// MailsByRecipientID retrieves a row from 'mail' as a Mail.
+//
+// Generated from index 'idx_mail_recipient_id'.
+func MailsByRecipientID(db XODB, recipientID int64) ([]*Mail, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`id, sender_id, recipient_id, content, ts_received, subject, is_deleted, ts_deleted ` +
+		`FROM mail ` +
+		`WHERE recipient_id = ?`
+
+	// run query
+	XOLog(sqlstr, recipientID)
+	q, err := db.Query(sqlstr, recipientID)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	res := []*Mail{}
+	for q.Next() {
+		m := Mail{
+			_exists: true,
+		}
+
+		// scan
+		err = q.Scan(&m.ID, &m.SenderID, &m.RecipientID, &m.Content, &m.TsReceived, &m.Subject, &m.IsDeleted, &m.TsDeleted)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &m)
+	}
+
+	return res, nil
+}
+
 // MailsBySenderID retrieves a row from 'mail' as a Mail.
 //
 // Generated from index 'idx_mail_sender_id'.
