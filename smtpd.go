@@ -105,7 +105,7 @@ func prepareLog() {
 		mlog.DefaultFlags = log.Ldate | log.Ltime | log.Lshortfile | log.Lmicroseconds
 		lvl = mlog.LevelTrace
 	}
-	mlog.Start(lvl, path.Join(logDir, "smtpd.log"))
+	mlog.Start(lvl, path.Join(logDir, cfg.Log.Path))
 }
 
 func printVersion() {
