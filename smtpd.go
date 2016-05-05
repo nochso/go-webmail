@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"strings"
 )
 
 var db *sql.DB
@@ -24,7 +25,6 @@ func main() {
 	prepareConfig()
 	mlog.DefaultFlags = log.Ldate | log.Ltime | log.Lmicroseconds
 	mlog.Start(mlog.LevelTrace, path.Join(logDir, "smtpd.log"))
-	mlog.Info("-----------------------------------------------")
 	printVersion()
 	user, err := user.Current()
 	if err == nil {
@@ -69,5 +69,6 @@ func printVersion() {
 	if BuildDate != "" {
 		version = fmt.Sprintf("%s (built %s)", version, BuildDate)
 	}
+	mlog.Info(strings.Repeat("-", len(version)))
 	mlog.Info(version)
 }
