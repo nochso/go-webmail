@@ -3,11 +3,12 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/nochso/go-webmail/models"
-	"github.com/nochso/mlog"
 	"net/mail"
 	"path"
 	"strings"
+
+	"github.com/nochso/go-webmail/models"
+	"github.com/nochso/mlog"
 )
 
 func openDatabase() *sql.DB {

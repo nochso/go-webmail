@@ -2,17 +2,18 @@ package main
 
 import "fmt"
 import (
-	"bitbucket.org/porkbonk/smtpd"
 	"database/sql"
-	"github.com/alexflint/go-arg"
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/nochso/mlog"
 	"log"
 	"os"
 	"os/user"
 	"path"
 	"runtime"
 	"strings"
+
+	"bitbucket.org/porkbonk/smtpd"
+	"github.com/alexflint/go-arg"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/nochso/mlog"
 )
 
 var db *sql.DB

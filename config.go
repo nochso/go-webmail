@@ -2,13 +2,14 @@ package main
 
 import (
 	"errors"
+	"io/ioutil"
+	"log"
+	"strings"
+
 	"github.com/aryann/difflib"
 	"github.com/imdario/mergo"
 	"github.com/nochso/mlog"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
-	"log"
-	"strings"
 )
 
 var cfg Config

@@ -1,16 +1,17 @@
 package main
 
 import (
-	"bitbucket.org/porkbonk/smtpd"
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"github.com/nochso/go-webmail/models"
-	"github.com/nochso/mlog"
 	"net/mail"
 	"path"
 	"strings"
 	"time"
+
+	"bitbucket.org/porkbonk/smtpd"
+	"github.com/nochso/go-webmail/models"
+	"github.com/nochso/mlog"
 )
 
 func prepareServer() *smtpd.Server {

@@ -6,13 +6,14 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"github.com/nochso/mlog"
 	"math/big"
 	"net"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/nochso/mlog"
 )
 
 func prepareCert() {
