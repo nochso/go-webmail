@@ -23,6 +23,7 @@ var args struct {
 	Verbose bool   `arg:"-v,help:enable detailed output"`
 	Config  string `arg:"-c,help:path to a specific configuration file"`
 	License bool   `arg:"-L,help:show software license"`
+	Version bool   `arg:"-V,help:show version"`
 }
 
 var Version = ""
@@ -41,6 +42,10 @@ func main() {
 	mlog.Start(lvl, path.Join(logDir, "smtpd.log"))
 	if args.License {
 		fmt.Println(string(MustAsset("LICENSE")))
+		os.Exit(0)
+	}
+	if args.Version {
+		fmt.Println(getVersion())
 		os.Exit(0)
 	}
 	printVersion()
@@ -96,6 +101,13 @@ func prepareDirs() {
 }
 
 func printVersion() {
+	version := getVersion()
+	mlog.Info(strings.Repeat("-", len(version)))
+	mlog.Info(version)
+	mlog.Info("Copyright (c) 2016 Marcel Voigt - See '-L' for software license.")
+}
+
+func getVersion() string {
 	version := "go-webmail (personal MDA+webmail)"
 	if Version != "" {
 		version += " " + Version
@@ -103,7 +115,5 @@ func printVersion() {
 	if BuildDate != "" {
 		version = fmt.Sprintf("%s (built %s)", version, BuildDate)
 	}
-	mlog.Info(strings.Repeat("-", len(version)))
-	mlog.Info(version)
-	mlog.Info("Copyright (c) 2016 Marcel Voigt - See '-L' for software license.")
+	return version
 }
