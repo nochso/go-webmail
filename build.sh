@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 rm data/mail.sqlite models/*.go
-go-bindata model.sql
+go-bindata model.sql LICENSE
 cat model.sql | sqlite3 -batch data/mail.sqlite
 xo sqlite3://data/mail.sqlite -o models --int32-type int64 --uint32-type uint64
 

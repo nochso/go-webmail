@@ -22,6 +22,7 @@ var logDir = "./log"
 var args struct {
 	Verbose bool   `arg:"-v,help:enable detailed output"`
 	Config  string `arg:"-c,help:path to a specific configuration file"`
+	License bool   `arg:"-L,help:show software license"`
 }
 
 var Version = ""
@@ -38,6 +39,10 @@ func main() {
 		lvl = mlog.LevelTrace
 	}
 	mlog.Start(lvl, path.Join(logDir, "smtpd.log"))
+	if args.License {
+		fmt.Println(string(MustAsset("LICENSE")))
+		os.Exit(0)
+	}
 	printVersion()
 	user, err := user.Current()
 	if err == nil {
@@ -100,6 +105,5 @@ func printVersion() {
 	}
 	mlog.Info(strings.Repeat("-", len(version)))
 	mlog.Info(version)
-	mlog.Info("Copyright (c) 2016 Marcel Voigt")
-	mlog.Info("License: MIT")
+	mlog.Info("Copyright (c) 2016 Marcel Voigt - See '-L' for software license.")
 }
