@@ -11,7 +11,7 @@ import (
 )
 
 func openDatabase() *sql.DB {
-	mlog.Info("Opening SQLite database")
+	mlog.Trace("Opening SQLite database")
 	dbPath := path.Join(dataDir, "mail.sqlite")
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
@@ -35,7 +35,7 @@ func openDatabase() *sql.DB {
 			}
 			query = strings.Replace(query, "?", trimValue, 1)
 		}
-		mlog.Trace("SQL: %s", query)
+		mlog.Trace("xo SQL: %s", query)
 	}
 	return db
 }

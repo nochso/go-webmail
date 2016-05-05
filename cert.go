@@ -72,7 +72,7 @@ func prepareCert() {
 	}
 	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
 	certOut.Close()
-	mlog.Info("written %s", certPath)
+	mlog.Info("written certificate: %s", certPath)
 
 	keyOut, err := os.OpenFile(keyPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
@@ -82,5 +82,5 @@ func prepareCert() {
 	pemBlock := &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)}
 	pem.Encode(keyOut, pemBlock)
 	keyOut.Close()
-	mlog.Info("written %s", keyPath)
+	mlog.Info("written private key: %s", keyPath)
 }

@@ -37,8 +37,10 @@ func main() {
 	prepareDatabase(db)
 	prepareCert()
 	server := prepareServer()
-	mlog.Info("Starting smtpd server")
-	err = server.ListenAndServe(fmt.Sprintf(":%d", cfg.Port))
+
+	addr := fmt.Sprintf(":%d", cfg.Port)
+	mlog.Info("Starting smtpd server on %s", addr)
+	err = server.ListenAndServe(addr)
 	if err != nil {
 		mlog.Fatalf("Error while listening/serving: %s", err)
 	}

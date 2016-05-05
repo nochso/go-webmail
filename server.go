@@ -10,10 +10,11 @@ import (
 	"path"
 	"strings"
 	"time"
+	"errors"
 )
 
 func prepareServer() *smtpd.Server {
-	mlog.Info("Loading TLS certificate")
+	mlog.Trace("Loading TLS certificate")
 	cert, err := tls.LoadX509KeyPair(path.Join(dataDir, "cert.pem"), path.Join(dataDir, "key.pem"))
 	if err != nil {
 		mlog.Fatalf("Cert load failed: %v", err)
@@ -30,7 +31,7 @@ func prepareServer() *smtpd.Server {
 }
 
 func handleConnection(peer smtpd.Peer) error {
-	mlog.Info("Connection accepted: remote_host=%s", peer.Addr)
+	mlog.Trace("Connection accepted: remote_host=%s", peer.Addr)
 	return nil
 }
 
@@ -45,7 +46,7 @@ func handle(peer smtpd.Peer, env smtpd.Envelope) error {
 		}
 		tlsInfo = fmt.Sprintf(" tls_version=%s tls_cypher=0x%x", tlsVersions[peer.TLS.Version], peer.TLS.CipherSuite)
 	}
-	mlog.Info(
+	mlog.Trace(
 		"Incoming mail: remote_host=%s protocol=%s helo_name=%s%s",
 		peer.Addr,
 		peer.Protocol,
@@ -71,7 +72,7 @@ func handle(peer smtpd.Peer, env smtpd.Envelope) error {
 		mlog.Warning("Ignoring mail: none of the recipient domains are allowed: %v", recipients)
 		return nil
 	}
-	mlog.Info("Saving %d mail(s) for recipient(s): %v", len(allowedRecipients), allowedRecipients)
+	mlog.Trace("Saving %d mail(s) for recipient(s): %v", len(allowedRecipients), allowedRecipients)
 	for _, recipient := range allowedRecipients {
 		mailRow := models.Mail{
 			SenderID:    getAddressId(sender),
@@ -82,7 +83,7 @@ func handle(peer smtpd.Peer, env smtpd.Envelope) error {
 		}
 		err = mailRow.Save(db)
 		if err != nil {
-			mlog.Warning(err.Error())
+			mlog.Error(errors.New("Unable to insert mail in database: " + err.Error()))
 		}
 	}
 	return nil
