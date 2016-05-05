@@ -65,7 +65,7 @@ func prepareDatabase(db *sql.DB) {
 	mlog.Info("Setting up database schema")
 	sql, err := Asset("model.sql")
 	if err != nil {
-		mlog.Fatalf("Unable to read embedded model.sql file: %s")
+		mlog.Fatalf("Unable to read embedded model.sql file: %s", err)
 	}
 	_, err = db.Exec(string(sql))
 	if err != nil {
