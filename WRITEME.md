@@ -10,6 +10,8 @@ changelog:
 @badge.license('nochso/go-webmail')@
 @badge.tag('nochso/go-webmail')@
 
+![go-webmail logo](logo.png)
+
 go-webmail is your personal MDA (mail delivery agent) and webmail interface.
 
 - Receive mails sent to your domain or development machine via SMTP.
