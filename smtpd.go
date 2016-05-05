@@ -33,13 +33,7 @@ func main() {
 	args.Config = "config.yaml"
 	arg.MustParse(&args)
 	prepareConfig()
-	mlog.DefaultFlags = log.Ldate | log.Ltime
-	lvl := mlog.LevelInfo
-	if args.Verbose {
-		mlog.DefaultFlags = log.Ldate | log.Ltime | log.Lshortfile | log.Lmicroseconds
-		lvl = mlog.LevelTrace
-	}
-	mlog.Start(lvl, path.Join(logDir, "smtpd.log"))
+	prepareLog()
 	if args.License {
 		fmt.Println(string(MustAsset("LICENSE")))
 		os.Exit(0)
@@ -49,6 +43,10 @@ func main() {
 		os.Exit(0)
 	}
 	printVersion()
+	runServer()
+}
+
+func runServer() {
 	user, err := user.Current()
 	if err == nil {
 		mlog.Info("Running as user '%s' in %s", user.Name, getwd(user))
@@ -98,6 +96,16 @@ func prepareDirs() {
 			mlog.Fatalf("Unable to create log folder '%s': %s", dataDir, err)
 		}
 	}
+}
+
+func prepareLog() {
+	mlog.DefaultFlags = log.Ldate | log.Ltime
+	lvl := mlog.LevelInfo
+	if args.Verbose {
+		mlog.DefaultFlags = log.Ldate | log.Ltime | log.Lshortfile | log.Lmicroseconds
+		lvl = mlog.LevelTrace
+	}
+	mlog.Start(lvl, path.Join(logDir, "smtpd.log"))
 }
 
 func printVersion() {
