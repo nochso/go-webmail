@@ -1,4 +1,4 @@
-
+PRAGMA foreign_keys = ON;
 CREATE TABLE "address" (
   "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
   "address" text NOT NULL,

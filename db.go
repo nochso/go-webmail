@@ -17,6 +17,13 @@ func openDatabase() *sql.DB {
 	if err != nil {
 		mlog.Fatalf("Unable to open or create SQLite database file '%s': %s", dbPath, err)
 	}
+	_, err = db.Exec("PRAGMA foreign_keys = ON;")
+	var fk int
+	db.QueryRow("PRAGMA foreign_keys;").Scan(&fk)
+	if err != nil || fk != 1 {
+		mlog.Fatalf("Unable to enforce foreign key constraints: %s", err)
+	}
+	mlog.Trace("Enforcing SQLite foreign key constraints")
 	models.XOLog = func(query string, data ...interface{}) {
 		for _, value := range data {
 			trimValue := fmt.Sprintf("%#v", value)
@@ -57,6 +64,7 @@ func prepareDatabase(db *sql.DB) {
 	}
 	mlog.Info("Setting up database schema")
 	_, err = db.Exec(`
+PRAGMA foreign_keys = ON;
 CREATE TABLE "address" (
   "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
   "address" text NOT NULL,
