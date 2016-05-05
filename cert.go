@@ -36,7 +36,7 @@ func prepareCert() {
 	template := x509.Certificate{
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
-			Organization: []string{"noch.so smtpd"},
+			Organization: []string{"noch.so go-webmail"},
 		},
 		NotBefore:             notBefore,
 		NotAfter:              notAfter,

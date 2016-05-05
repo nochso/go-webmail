@@ -1,6 +1,6 @@
 bindata.go
-smtpd.exe
-smtpd
+go-webmail.exe
+go-webmail
 data/*
 log/*
 config.yaml

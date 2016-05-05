@@ -3,8 +3,8 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/nochso/go-webmail/models"
 	"github.com/nochso/mlog"
-	"github.com/nochso/smtpd/models"
 	"net/mail"
 	"path"
 	"strings"

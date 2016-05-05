@@ -61,7 +61,7 @@ func runServer() {
 	server := prepareServer()
 
 	addr := fmt.Sprintf(":%d", cfg.Port)
-	mlog.Info("Starting smtpd server on %s", addr)
+	mlog.Info("Starting go-webmail server on %s", addr)
 	err = server.ListenAndServe(addr)
 	if err != nil {
 		mlog.Fatalf("Error while listening/serving: %s", err)

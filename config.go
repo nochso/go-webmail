@@ -47,7 +47,7 @@ func getDefaultConfig() *Config {
 			Accept: Accept{Domains: []string{"localhost"}},
 		},
 		Log: Log{
-			Path: "smtpd.log",
+			Path: "go-webmail.log",
 		},
 	}
 }
