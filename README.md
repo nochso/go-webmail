@@ -12,7 +12,7 @@ go-webmail is your personal MDA (mail delivery agent) and webmail interface.
 - Keep mails on your own private server.
 - Access your mails through an encrypted web interface.
 
-* * *
+Currently in the early stages of development and considered unstable.
 
 - [go-webmail](#go-webmail)
 - [Requirements](#requirements)
