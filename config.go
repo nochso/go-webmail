@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"github.com/aryann/difflib"
 	"github.com/imdario/mergo"
+	"github.com/nochso/mlog"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -34,7 +36,7 @@ func prepareConfig() {
 	}
 	err = mergo.Merge(&cfg, getDefaultConfig())
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errors.New("unable to merge configuration: " + err.Error()))
 	}
 }
 
@@ -53,7 +55,8 @@ func getDefaultConfig() *Config {
 func getConfigDiff() string {
 	configYaml, err := yaml.Marshal(&cfg)
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		mlog.Error(errors.New("Unable to dump configuration to YAML: " + err.Error()))
+		return ""
 	}
 	defaultYaml, err := yaml.Marshal(getDefaultConfig())
 	diff := difflib.Diff(strings.Split(string(defaultYaml), "\n"), strings.Split(string(configYaml), "\n"))

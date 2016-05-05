@@ -3,6 +3,7 @@ package main
 import (
 	"bitbucket.org/porkbonk/smtpd"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"github.com/nochso/mlog"
 	"github.com/nochso/smtpd/models"
@@ -10,7 +11,6 @@ import (
 	"path"
 	"strings"
 	"time"
-	"errors"
 )
 
 func prepareServer() *smtpd.Server {

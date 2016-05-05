@@ -4,12 +4,14 @@ import "fmt"
 import (
 	"bitbucket.org/porkbonk/smtpd"
 	"database/sql"
+	"github.com/alexflint/go-arg"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/nochso/mlog"
 	"log"
 	"os"
 	"os/user"
 	"path"
+	"runtime"
 	"strings"
 )
 
@@ -17,20 +19,32 @@ var db *sql.DB
 var server *smtpd.Server
 var dataDir = "./data"
 var logDir = "./log"
+var args struct {
+	Verbose bool   `arg:"-v,help:enable detailed output"`
+	Config  string `arg:"-c,help:path to a specific configuration file"`
+}
 
 var Version = ""
 var BuildDate = ""
 
 func main() {
+	args.Config = "config.yaml"
+	arg.MustParse(&args)
 	prepareConfig()
-	mlog.DefaultFlags = log.Ldate | log.Ltime | log.Lmicroseconds
-	mlog.Start(mlog.LevelTrace, path.Join(logDir, "smtpd.log"))
+	mlog.DefaultFlags = log.Ldate | log.Ltime
+	lvl := mlog.LevelInfo
+	if args.Verbose {
+		mlog.DefaultFlags = log.Ldate | log.Ltime | log.Lshortfile | log.Lmicroseconds
+		lvl = mlog.LevelTrace
+	}
+	mlog.Start(lvl, path.Join(logDir, "smtpd.log"))
 	printVersion()
 	user, err := user.Current()
 	if err == nil {
-		mlog.Info("Running as user '%s'", user.Name)
+		mlog.Info("Running as user '%s' in %s", user.Name, getwd(user))
 	}
-	mlog.Info("Loaded configuration:\n%s", getConfigDiff())
+	mlog.Info("Loaded configuration from %s", args.Config)
+	mlog.Trace("%s", getConfigDiff())
 	prepareDirs()
 	db = openDatabase()
 	defer db.Close()
@@ -44,6 +58,21 @@ func main() {
 	if err != nil {
 		mlog.Fatalf("Error while listening/serving: %s", err)
 	}
+}
+
+func getwd(user *user.User) string {
+	wd, err := os.Getwd()
+	if err != nil {
+		wd = "unknown working directory"
+	}
+	if strings.HasPrefix(wd, user.HomeDir) {
+		prefix := "~"
+		if runtime.GOOS == "windows" {
+			prefix = "%HOME%"
+		}
+		wd = prefix + strings.TrimPrefix(wd, user.HomeDir)
+	}
+	return wd
 }
 
 func prepareDirs() {
@@ -62,13 +91,15 @@ func prepareDirs() {
 }
 
 func printVersion() {
-	version := "noch.so smtpd"
+	version := "go-webmail (personal MDA+webmail)"
 	if Version != "" {
-		version = fmt.Sprintf("%s %s", version, Version)
+		version += " " + Version
 	}
 	if BuildDate != "" {
 		version = fmt.Sprintf("%s (built %s)", version, BuildDate)
 	}
 	mlog.Info(strings.Repeat("-", len(version)))
 	mlog.Info(version)
+	mlog.Info("Copyright (c) 2016 Marcel Voigt")
+	mlog.Info("License: MIT")
 }
