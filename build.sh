@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-cat model.sql | sqlite3 -interactive data/mail.sqlite
+cat model.sql | sqlite3 -batch data/mail.sqlite
 xo sqlite3://data/mail.sqlite -o models --int32-type int64 --uint32-type uint64
 
 # With tag: 1.0.0[-commits since tag][-dirty]
