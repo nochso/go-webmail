@@ -133,6 +133,20 @@ func (m *Mail) Delete(db XODB) error {
 	return nil
 }
 
+// AddressByRecipientID returns the Address associated with the Mail's RecipientID (recipient_id).
+//
+// Generated from foreign key 'mail_recipient_id_fkey'.
+func (m *Mail) AddressByRecipientID(db XODB) (*Address, error) {
+	return AddressByID(db, m.RecipientID)
+}
+
+// AddressBySenderID returns the Address associated with the Mail's SenderID (sender_id).
+//
+// Generated from foreign key 'mail_sender_id_fkey'.
+func (m *Mail) AddressBySenderID(db XODB) (*Address, error) {
+	return AddressByID(db, m.SenderID)
+}
+
 // MailsByIsDeletedTsDeleted retrieves a row from 'mail' as a Mail.
 //
 // Generated from index 'idx_mail_is_deleted_ts_deleted'.
