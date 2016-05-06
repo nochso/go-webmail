@@ -32,6 +32,16 @@ var Version = ""
 var BuildDate = ""
 
 func main() {
+	// Might exit early
+	handleArgs()
+	// Running as a daemon from now on
+	prepareConfig()
+	prepareLog()
+	printVersion(true)
+	runServer()
+}
+
+func handleArgs() {
 	args.Config = "config.yaml"
 	p, err := arg.NewParser(arg.Config{}, &args)
 	if err != nil {
@@ -48,8 +58,6 @@ func main() {
 		printVersion(false)
 		p.Fail(err.Error())
 	}
-	prepareConfig()
-	prepareLog()
 	if args.License {
 		fmt.Println(string(MustAsset("LICENSE")))
 		os.Exit(0)
@@ -58,8 +66,6 @@ func main() {
 		printVersion(false)
 		os.Exit(0)
 	}
-	printVersion(true)
-	runServer()
 }
 
 func runServer() {
