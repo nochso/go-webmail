@@ -7,7 +7,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/nochso/go-webmail/models"
+	"github.com/nochso/go-webmail/model"
 	"github.com/nochso/mlog"
 )
 
@@ -25,7 +25,7 @@ func openDatabase() *sql.DB {
 		mlog.Fatalf("Unable to enforce foreign key constraints: %s", err)
 	}
 	mlog.Trace("Enforcing SQLite foreign key constraints")
-	models.XOLog = func(query string, data ...interface{}) {
+	model.XOLog = func(query string, data ...interface{}) {
 		for _, value := range data {
 			trimValue := fmt.Sprintf("%#v", value)
 			if len(trimValue) > 40 {
@@ -42,9 +42,9 @@ func openDatabase() *sql.DB {
 }
 
 func getAddressId(address *mail.Address) int64 {
-	addrRow, err := models.AddressByAddress(db, address.Address)
+	addrRow, err := model.AddressByAddress(db, address.Address)
 	if err != nil {
-		addrRow = &models.Address{
+		addrRow = &model.Address{
 			Address: address.Address,
 			Name:    address.Name,
 		}

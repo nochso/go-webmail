@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-rm data/mail.sqlite models/*.xo.go
-go-bindata model.sql LICENSE
-cat model.sql | sqlite3 -batch data/mail.sqlite
-xo sqlite3://data/mail.sqlite -o models --int32-type int64 --uint32-type uint64
-xo sqlite3://data/mail.sqlite -o models -a -N -M -B -T Flag -F GetFlags << ENDSQL
+rm -f data/mail.sqlite model/*.xo.go
+go-bindata asset/model.sql LICENSE
+mkdir -p model
+cat asset/model.sql | sqlite3 -batch data/mail.sqlite
+xo sqlite3://data/mail.sqlite -o model --int32-type int64 --uint32-type uint64
+xo sqlite3://data/mail.sqlite -o model -a -N -M -B -T Flag -F GetFlags << ENDSQL
 SELECT
   f.id,
   f.name

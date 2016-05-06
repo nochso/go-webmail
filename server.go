@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"bitbucket.org/porkbonk/smtpd"
-	"github.com/nochso/go-webmail/models"
+	"github.com/nochso/go-webmail/model"
 	"github.com/nochso/mlog"
 )
 
@@ -75,7 +75,7 @@ func handle(peer smtpd.Peer, env smtpd.Envelope) error {
 	}
 	mlog.Trace("Saving %d mail(s) for recipient(s): %v", len(allowedRecipients), allowedRecipients)
 	for _, recipient := range allowedRecipients {
-		mailRow := models.Mail{
+		mailRow := model.Mail{
 			SenderID:    getAddressId(sender),
 			RecipientID: getAddressId(recipient),
 			Content:     string(env.Data),
