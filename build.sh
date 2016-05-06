@@ -14,6 +14,6 @@ ENDSQL
 # Without existing tags: 4a4154a[-dirty]
 version=$(git describe --tags --always --dirty)
 # 2000-12-13 13:00:00
-buildDate=$(date --utc "+%F %T")
+buildDate=$(date --utc "+%F %H:%M %Z")
 go build -ldflags "-X 'main.Version=$version' -X 'main.BuildDate=$buildDate'"
 echo Built version $version

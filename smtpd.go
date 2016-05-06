@@ -14,6 +14,7 @@ import (
 	"github.com/alexflint/go-arg"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/nochso/mlog"
+	"path/filepath"
 )
 
 var db *sql.DB
@@ -32,7 +33,21 @@ var BuildDate = ""
 
 func main() {
 	args.Config = "config.yaml"
-	arg.MustParse(&args)
+	p, err := arg.NewParser(arg.Config{}, &args)
+	if err != nil {
+		fmt.Errorf("Error parsing CLI arguments: %s", err)
+		os.Exit(-1)
+	}
+	err = p.Parse(os.Args[1:])
+	if err == arg.ErrHelp {
+		printVersion(false)
+		p.WriteHelp(os.Stdout)
+		os.Exit(0)
+	}
+	if err != nil {
+		printVersion(false)
+		p.Fail(err.Error())
+	}
 	prepareConfig()
 	prepareLog()
 	if args.License {
@@ -40,19 +55,23 @@ func main() {
 		os.Exit(0)
 	}
 	if args.Version {
-		fmt.Println(getVersion())
+		printVersion(false)
 		os.Exit(0)
 	}
-	printVersion()
+	printVersion(true)
 	runServer()
 }
 
 func runServer() {
 	user, err := user.Current()
 	if err == nil {
-		mlog.Info("Running as user '%s' in %s", user.Name, getwd(user))
+		mlog.Info("Running as user '%s' in %s", user.Name, getwd())
 	}
-	mlog.Info("Loaded configuration from %s", args.Config)
+	fp, err := filepath.Abs(args.Config)
+	if err != nil {
+		fp = args.Config
+	}
+	mlog.Info("Loaded configuration from %s", prettyPath(fp))
 	mlog.Trace("%s", getConfigDiff())
 	prepareDirs()
 	db = openDatabase()
@@ -69,19 +88,24 @@ func runServer() {
 	}
 }
 
-func getwd(user *user.User) string {
+func getwd() string {
 	wd, err := os.Getwd()
 	if err != nil {
-		wd = "unknown working directory"
+		return "unknown working directory"
 	}
-	if strings.HasPrefix(wd, user.HomeDir) {
+	return prettyPath(wd)
+}
+
+func prettyPath(path string) string {
+	user, err := user.Current()
+	if err == nil && strings.HasPrefix(path, user.HomeDir) {
 		prefix := "~"
 		if runtime.GOOS == "windows" {
 			prefix = "%HOME%"
 		}
-		wd = prefix + strings.TrimPrefix(wd, user.HomeDir)
+		path = prefix + strings.TrimPrefix(path, user.HomeDir)
 	}
-	return wd
+	return path
 }
 
 func prepareDirs() {
@@ -109,20 +133,23 @@ func prepareLog() {
 	mlog.Start(lvl, path.Join(logDir, cfg.Log.Path))
 }
 
-func printVersion() {
-	version := getVersion()
-	mlog.Info(strings.Repeat("-", len(version)))
-	mlog.Info(version)
-	mlog.Info("Copyright (c) 2016 Marcel Voigt - See '-L' for software license.")
-}
-
-func getVersion() string {
-	version := "go-webmail (personal MDA+webmail)"
+func printVersion(log bool) {
+	t := "go-webmail"
 	if Version != "" {
-		version += " " + Version
+		t += " " + Version
 	}
 	if BuildDate != "" {
-		version = fmt.Sprintf("%s (built %s)", version, BuildDate)
+		t += " " + BuildDate
 	}
-	return version
+	t += "\n(C) 2016 Marcel Voigt - Released under the MIT license"
+	if log {
+		lines := strings.Split(t, "\n")
+		mlog.Info("")
+		for _, l := range lines {
+			mlog.Info(l)
+		}
+		mlog.Info("")
+	} else {
+		fmt.Println(t + "\n")
+	}
 }
