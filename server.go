@@ -22,6 +22,7 @@ func prepareServer() *smtpd.Server {
 	}
 	server = &smtpd.Server{
 		ConnectionChecker: handleConnection,
+		RecipientChecker:  handleRcpt,
 		Handler:           handle,
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{cert},
@@ -34,6 +35,15 @@ func prepareServer() *smtpd.Server {
 func handleConnection(peer smtpd.Peer) error {
 	mlog.Trace("Connection accepted: remote_host=%s", peer.Addr)
 	return nil
+}
+
+// handleRcpt makes sure to reject unknown recipients. Error 550 when rejected.
+func handleRcpt(peer smtpd.Peer, addr string) error {
+	if addressBelongsToHost(mail.Address{Address: addr}) {
+		return nil
+	}
+	mlog.Warning("Rejecting mail addressed to '%s' with error 550", addr)
+	return smtpd.Error{Code: 550, Message: "No such user here"}
 }
 
 func handle(peer smtpd.Peer, env smtpd.Envelope) error {
