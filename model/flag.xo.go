@@ -150,6 +150,32 @@ func FlagByID(db XODB, id int64) (*Flag, error) {
 	return &f, nil
 }
 
+// FlagByName retrieves a row from 'flag' as a Flag.
+//
+// Generated from index 'uidx_flag_name'.
+func FlagByName(db XODB, name string) (*Flag, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`id, name ` +
+		`FROM flag ` +
+		`WHERE name = ?`
+
+	// run query
+	XOLog(sqlstr, name)
+	f := Flag{
+		_exists: true,
+	}
+
+	err = db.QueryRow(sqlstr, name).Scan(&f.ID, &f.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	return &f, nil
+}
+
 // GetFlags runs a custom query, returning results as Flag.
 func GetFlags(db XODB) ([]*Flag, error) {
 	var err error

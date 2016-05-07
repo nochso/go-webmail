@@ -97,6 +97,9 @@ func handle(peer smtpd.Peer, env smtpd.Envelope) error {
 		if err != nil {
 			mlog.Error(errors.New("Unable to insert mail in database: " + err.Error()))
 		}
+		recent, _ := model.FlagByName(db, `\Recent`)
+		mailRecent := model.FlagMail{FlagID: recent.ID, MailID: mailRow.ID}
+		mailRecent.Insert(db)
 	}
 	return nil
 }

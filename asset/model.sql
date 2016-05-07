@@ -45,6 +45,7 @@ CREATE TABLE "flag" (
   "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
   "name" text NOT NULL
 );
+CREATE UNIQUE INDEX "uidx_flag_name" ON "flag" ("name");
 INSERT INTO "flag" ("id", "name") VALUES (1,	'\Seen');
 INSERT INTO "flag" ("id", "name") VALUES (2,	'\Answered');
 INSERT INTO "flag" ("id", "name") VALUES (3,	'\Flagged');
