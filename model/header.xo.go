@@ -149,3 +149,29 @@ func HeaderByID(db XODB, id int64) (*Header, error) {
 
 	return &h, nil
 }
+
+// HeaderByName retrieves a row from 'header' as a Header.
+//
+// Generated from index 'uidx_header_name'.
+func HeaderByName(db XODB, name string) (*Header, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`id, name ` +
+		`FROM header ` +
+		`WHERE name = ?`
+
+	// run query
+	XOLog(sqlstr, name)
+	h := Header{
+		_exists: true,
+	}
+
+	err = db.QueryRow(sqlstr, name).Scan(&h.ID, &h.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	return &h, nil
+}

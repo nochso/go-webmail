@@ -65,6 +65,7 @@ CREATE TABLE "header" (
   "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
   "name" text NOT NULL
 );
+CREATE UNIQUE INDEX "uidx_header_name" ON "header" ("name");
 CREATE TABLE "header_mail" (
   "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
   "header_id" integer NOT NULL,
