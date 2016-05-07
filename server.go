@@ -92,7 +92,7 @@ func handle(peer smtpd.Peer, env smtpd.Envelope) error {
 		err = mailRow.Save(db)
 		toRow := model.AddressTo{MailID: mailRow.ID, AddressID: getAddressId(recipient)}
 		toRow.Insert(db)
-		fromRow := model.AddressFrom{MailID:  mailRow.ID, AddressID: getAddressId(sender)}
+		fromRow := model.AddressFrom{MailID: mailRow.ID, AddressID: getAddressId(sender)}
 		fromRow.Save(db)
 		if err != nil {
 			mlog.Error(errors.New("Unable to insert mail in database: " + err.Error()))

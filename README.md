@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/github/license/nochso/go-webmail.svg)](https://packagist.org/packages/nochso/go-webmail)
 [![Latest tag on Github](https://img.shields.io/github/tag/nochso/go-webmail.svg)](https://github.com/nochso/go-webmail/tags)
 
-![go-webmail logo](logo.png)
+![go-webmail logo](asset/logo.png)
 
 go-webmail is your personal MDA (mail delivery agent) and webmail interface.
 
