@@ -39,7 +39,7 @@ func handleConnection(peer smtpd.Peer) error {
 
 // handleRcpt makes sure to reject unknown recipients. Error 550 when rejected.
 func handleRcpt(peer smtpd.Peer, addr string) error {
-	if addressBelongsToHost(mail.Address{Address: addr}) {
+	if addressBelongsToHost(&mail.Address{Address: addr}) {
 		return nil
 	}
 	mlog.Warning("Rejecting mail addressed to '%s' with error 550", addr)
