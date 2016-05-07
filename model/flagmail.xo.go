@@ -132,10 +132,10 @@ func (fm *FlagMail) Flag(db XODB) (*Flag, error) {
 	return FlagByID(db, fm.FlagID)
 }
 
-// Mail returns the Mail associated with the FlagMail's MailID (mail_id).
+// MailByMailID returns the Mail associated with the FlagMail's MailID (mail_id).
 //
 // Generated from foreign key 'flag_mail_mail_id_fkey'.
-func (fm *FlagMail) Mail(db XODB) (*Mail, error) {
+func (fm *FlagMail) MailByMailID(db XODB) (*Mail, error) {
 	return MailByID(db, fm.MailID)
 }
 
@@ -180,6 +180,45 @@ func FlagMailsByFlagIDMailID(db XODB, flagID int64, mailID int64) ([]*FlagMail, 
 	// run query
 	XOLog(sqlstr, flagID, mailID)
 	q, err := db.Query(sqlstr, flagID, mailID)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	res := []*FlagMail{}
+	for q.Next() {
+		fm := FlagMail{
+			_exists: true,
+		}
+
+		// scan
+		err = q.Scan(&fm.ID, &fm.FlagID, &fm.MailID)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &fm)
+	}
+
+	return res, nil
+}
+
+// FlagMailsByMailID retrieves a row from 'flag_mail' as a FlagMail.
+//
+// Generated from index 'idx_flag_mail_mail_id'.
+func FlagMailsByMailID(db XODB, mailID int64) ([]*FlagMail, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`id, flag_id, mail_id ` +
+		`FROM flag_mail ` +
+		`WHERE mail_id = ?`
+
+	// run query
+	XOLog(sqlstr, mailID)
+	q, err := db.Query(sqlstr, mailID)
 	if err != nil {
 		return nil, err
 	}

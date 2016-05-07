@@ -42,7 +42,7 @@ func openDatabase() *sql.DB {
 }
 
 func getAddressId(address *mail.Address) int64 {
-	addrRow, err := model.AddressByAddress(db, address.Address)
+	addrRow, err := model.AddressByAddressName(db, address.Address, address.Name)
 	if err != nil {
 		addrRow = &model.Address{
 			Address: address.Address,

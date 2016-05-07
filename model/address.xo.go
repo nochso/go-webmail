@@ -151,64 +151,25 @@ func AddressByID(db XODB, id int64) (*Address, error) {
 	return &a, nil
 }
 
-// AddressesByAddress retrieves a row from 'address' as a Address.
+// AddressByAddressName retrieves a row from 'address' as a Address.
 //
-// Generated from index 'idx_address_address'.
-func AddressesByAddress(db XODB, address string) ([]*Address, error) {
+// Generated from index 'uidx_address_address_name'.
+func AddressByAddressName(db XODB, address string, name string) (*Address, error) {
 	var err error
 
 	// sql query
 	const sqlstr = `SELECT ` +
 		`id, address, name ` +
 		`FROM address ` +
-		`WHERE address = ?`
+		`WHERE address = ? AND name = ?`
 
 	// run query
-	XOLog(sqlstr, address)
-	q, err := db.Query(sqlstr, address)
-	if err != nil {
-		return nil, err
-	}
-	defer q.Close()
-
-	// load results
-	res := []*Address{}
-	for q.Next() {
-		a := Address{
-			_exists: true,
-		}
-
-		// scan
-		err = q.Scan(&a.ID, &a.Address, &a.Name)
-		if err != nil {
-			return nil, err
-		}
-
-		res = append(res, &a)
-	}
-
-	return res, nil
-}
-
-// AddressByAddress retrieves a row from 'address' as a Address.
-//
-// Generated from index 'uidx_address_address'.
-func AddressByAddress(db XODB, address string) (*Address, error) {
-	var err error
-
-	// sql query
-	const sqlstr = `SELECT ` +
-		`id, address, name ` +
-		`FROM address ` +
-		`WHERE address = ?`
-
-	// run query
-	XOLog(sqlstr, address)
+	XOLog(sqlstr, address, name)
 	a := Address{
 		_exists: true,
 	}
 
-	err = db.QueryRow(sqlstr, address).Scan(&a.ID, &a.Address, &a.Name)
+	err = db.QueryRow(sqlstr, address, name).Scan(&a.ID, &a.Address, &a.Name)
 	if err != nil {
 		return nil, err
 	}

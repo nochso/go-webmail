@@ -7,12 +7,9 @@ import "errors"
 
 // Mail represents a row from 'mail'.
 type Mail struct {
-	ID          int64  // id
-	SenderID    int64  // sender_id
-	RecipientID int64  // recipient_id
-	Content     string // content
-	Subject     string // subject
-	TsReceived  int64  // ts_received
+	ID         int64  // id
+	Content    string // content
+	TsReceived int64  // ts_received
 
 	// xo fields
 	_exists, _deleted bool
@@ -39,14 +36,14 @@ func (m *Mail) Insert(db XODB) error {
 
 	// sql query
 	const sqlstr = `INSERT INTO mail (` +
-		`sender_id, recipient_id, content, subject, ts_received` +
+		`content, ts_received` +
 		`) VALUES (` +
-		`?, ?, ?, ?, ?` +
+		`?, ?` +
 		`)`
 
 	// run query
-	XOLog(sqlstr, m.SenderID, m.RecipientID, m.Content, m.Subject, m.TsReceived)
-	res, err := db.Exec(sqlstr, m.SenderID, m.RecipientID, m.Content, m.Subject, m.TsReceived)
+	XOLog(sqlstr, m.Content, m.TsReceived)
+	res, err := db.Exec(sqlstr, m.Content, m.TsReceived)
 	if err != nil {
 		return err
 	}
@@ -80,12 +77,12 @@ func (m *Mail) Update(db XODB) error {
 
 	// sql query
 	const sqlstr = `UPDATE mail SET ` +
-		`sender_id = ?, recipient_id = ?, content = ?, subject = ?, ts_received = ?` +
+		`content = ?, ts_received = ?` +
 		` WHERE id = ?`
 
 	// run query
-	XOLog(sqlstr, m.SenderID, m.RecipientID, m.Content, m.Subject, m.TsReceived, m.ID)
-	_, err = db.Exec(sqlstr, m.SenderID, m.RecipientID, m.Content, m.Subject, m.TsReceived, m.ID)
+	XOLog(sqlstr, m.Content, m.TsReceived, m.ID)
+	_, err = db.Exec(sqlstr, m.Content, m.TsReceived, m.ID)
 	return err
 }
 
@@ -128,98 +125,6 @@ func (m *Mail) Delete(db XODB) error {
 	return nil
 }
 
-// AddressByRecipientID returns the Address associated with the Mail's RecipientID (recipient_id).
-//
-// Generated from foreign key 'mail_recipient_id_fkey'.
-func (m *Mail) AddressByRecipientID(db XODB) (*Address, error) {
-	return AddressByID(db, m.RecipientID)
-}
-
-// AddressBySenderID returns the Address associated with the Mail's SenderID (sender_id).
-//
-// Generated from foreign key 'mail_sender_id_fkey'.
-func (m *Mail) AddressBySenderID(db XODB) (*Address, error) {
-	return AddressByID(db, m.SenderID)
-}
-
-// MailsByRecipientID retrieves a row from 'mail' as a Mail.
-//
-// Generated from index 'idx_mail_recipient_id'.
-func MailsByRecipientID(db XODB, recipientID int64) ([]*Mail, error) {
-	var err error
-
-	// sql query
-	const sqlstr = `SELECT ` +
-		`id, sender_id, recipient_id, content, subject, ts_received ` +
-		`FROM mail ` +
-		`WHERE recipient_id = ?`
-
-	// run query
-	XOLog(sqlstr, recipientID)
-	q, err := db.Query(sqlstr, recipientID)
-	if err != nil {
-		return nil, err
-	}
-	defer q.Close()
-
-	// load results
-	res := []*Mail{}
-	for q.Next() {
-		m := Mail{
-			_exists: true,
-		}
-
-		// scan
-		err = q.Scan(&m.ID, &m.SenderID, &m.RecipientID, &m.Content, &m.Subject, &m.TsReceived)
-		if err != nil {
-			return nil, err
-		}
-
-		res = append(res, &m)
-	}
-
-	return res, nil
-}
-
-// MailsBySenderID retrieves a row from 'mail' as a Mail.
-//
-// Generated from index 'idx_mail_sender_id'.
-func MailsBySenderID(db XODB, senderID int64) ([]*Mail, error) {
-	var err error
-
-	// sql query
-	const sqlstr = `SELECT ` +
-		`id, sender_id, recipient_id, content, subject, ts_received ` +
-		`FROM mail ` +
-		`WHERE sender_id = ?`
-
-	// run query
-	XOLog(sqlstr, senderID)
-	q, err := db.Query(sqlstr, senderID)
-	if err != nil {
-		return nil, err
-	}
-	defer q.Close()
-
-	// load results
-	res := []*Mail{}
-	for q.Next() {
-		m := Mail{
-			_exists: true,
-		}
-
-		// scan
-		err = q.Scan(&m.ID, &m.SenderID, &m.RecipientID, &m.Content, &m.Subject, &m.TsReceived)
-		if err != nil {
-			return nil, err
-		}
-
-		res = append(res, &m)
-	}
-
-	return res, nil
-}
-
 // MailsByTsReceived retrieves a row from 'mail' as a Mail.
 //
 // Generated from index 'idx_mail_ts_received'.
@@ -228,7 +133,7 @@ func MailsByTsReceived(db XODB, tsReceived int64) ([]*Mail, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`id, sender_id, recipient_id, content, subject, ts_received ` +
+		`id, content, ts_received ` +
 		`FROM mail ` +
 		`WHERE ts_received = ?`
 
@@ -248,7 +153,7 @@ func MailsByTsReceived(db XODB, tsReceived int64) ([]*Mail, error) {
 		}
 
 		// scan
-		err = q.Scan(&m.ID, &m.SenderID, &m.RecipientID, &m.Content, &m.Subject, &m.TsReceived)
+		err = q.Scan(&m.ID, &m.Content, &m.TsReceived)
 		if err != nil {
 			return nil, err
 		}
@@ -267,7 +172,7 @@ func MailByID(db XODB, id int64) (*Mail, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`id, sender_id, recipient_id, content, subject, ts_received ` +
+		`id, content, ts_received ` +
 		`FROM mail ` +
 		`WHERE id = ?`
 
@@ -277,7 +182,7 @@ func MailByID(db XODB, id int64) (*Mail, error) {
 		_exists: true,
 	}
 
-	err = db.QueryRow(sqlstr, id).Scan(&m.ID, &m.SenderID, &m.RecipientID, &m.Content, &m.Subject, &m.TsReceived)
+	err = db.QueryRow(sqlstr, id).Scan(&m.ID, &m.Content, &m.TsReceived)
 	if err != nil {
 		return nil, err
 	}

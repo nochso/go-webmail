@@ -76,13 +76,14 @@ func handle(peer smtpd.Peer, env smtpd.Envelope) error {
 	mlog.Trace("Saving %d mail(s) for recipient(s): %v", len(allowedRecipients), allowedRecipients)
 	for _, recipient := range allowedRecipients {
 		mailRow := model.Mail{
-			SenderID:    getAddressId(sender),
-			RecipientID: getAddressId(recipient),
-			Content:     string(env.Data),
-			TsReceived:  time.Now().Unix(),
-			Subject:     header.Get("Subject"),
+			Content:    string(env.Data),
+			TsReceived: time.Now().Unix(),
 		}
 		err = mailRow.Save(db)
+		toRow := model.AddressTo{MailID: mailRow.ID, AddressID: getAddressId(recipient)}
+		toRow.Insert(db)
+		fromRow := model.AddressFrom{MailID:  mailRow.ID, AddressID: getAddressId(sender)}
+		fromRow.Save(db)
 		if err != nil {
 			mlog.Error(errors.New("Unable to insert mail in database: " + err.Error()))
 		}
